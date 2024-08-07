@@ -84,9 +84,8 @@ sudo chown root: /usr/local/bin/kubectl
 
 2. Setup the kube config file: Take our template file [`kubeconfig.yaml`](kubeconfig.yaml) as your config in the home folder `~/.kube/config`. Note that the file on your machine has no suffix.
 ```bash
-curl -o  ~/.kube/config https://raw.githubusercontent.com/epfml/getting-started/main/kubeconfig.yaml
+curl -o  ~/.kube/config https://raw.githubusercontent.com/NicolasRR/getting-started/main/kubeconfig.yaml
 ```
-TOBECHANGED
 
 1. Install the run:ai CLI for RCP
 ```bash
@@ -136,7 +135,7 @@ However, we provide a few scripts in this repository to make your life easier to
 ## 4: Use this repo to start a job
 1. Clone this repository and create a `user.yaml` file in the root folder of the repo using the template in `templates/user_template.yaml`.
 ```bash
-git clone https://github.com/epfml/getting-started.git
+git clone https://github.com/NicolasRR/getting-started.git
 cd getting-started
 touch user.yaml # then copy the content from templates/user_template.yaml inside here and update
 ```
