@@ -59,7 +59,7 @@ parser.add_argument(
     "--image",
     type=str,
     required=False,
-    default="ic-registry.epfl.ch/mlo/mlo:v1",
+    default="registry.rcp.epfl.ch/reategui/reategui-base",
     help="The URL of the docker image that will be used for the job",
 )
 parser.add_argument(
