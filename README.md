@@ -299,9 +299,9 @@ In case you want to customize it and create your own docker image, follow these 
 * Upload your image to EPFL's registry
 ```bash
 docker build . -t <your-tag>
-docker login ic-registry.epfl.ch -u <your-epfl-username> -p <your-epfl-password> # use your epfl credentials
-docker tag <your-tag> ic-registry.epfl.ch/upamathis/<your-tag>
-docker push ic-registry.epfl.ch/upamathis/<your-tag>
+docker login registry.rcp.epfl.ch -u <your-epfl-username> -p <your-epfl-password> # use your epfl credentials
+docker tag <your-tag> registry.rcp.epfl.ch/upamathis/<your-tag>
+docker push registry.rcp.epfl.ch/upamathis/<your-tag>
 ```
 
 ## Port forwarding
