@@ -26,6 +26,7 @@ RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
     keychain \
+    libgl1-mesa-glx \
     && rm -rf /var/lib/apt/lists/*
 
 RUN locale-gen en_US.UTF-8
