@@ -18,6 +18,13 @@ parser.add_argument(
     help="Job name (has to be unique in the namespace)",
 )
 parser.add_argument(
+    "-cl",
+    "--cluster",
+    type=str,
+    default="rcp-caas-prod",
+    choices=["rcp-caas-test", "ic-caas", "rcp-caas-prod"],
+)
+parser.add_argument(
     "-c",
     "--command",
     type=str,
@@ -93,7 +100,15 @@ parser.add_argument(
     type=int,
     help="specifies the number of retries before marking a workload as failed (default 0). only exists for train jobs",
 )
-
+parser.add_argument(
+    "--node_type",
+    type=str,
+    default="",
+    choices=["", "g9", "g10", "h100"],
+    help="node type to run on (default is empty, which means any node). \
+          IC cluster: g9 for V100, g10 for A100. \
+          RCP-Prod cluster: h100 for H100",
+)
 parser.add_argument(
     "--host_ipc",
     action="store_true",
@@ -103,6 +118,11 @@ parser.add_argument(
     "--no_symlinks",
     action="store_true",
     help="do not create symlinks to the user's home directory",
+)
+parser.add_argument(
+    "--large_shm",
+    action="store_true",
+    help="use large shared memory /dev/shm for the job",
 )
 
 if __name__ == "__main__":
@@ -127,8 +147,16 @@ if __name__ == "__main__":
         text=True,
     ).stdout.strip()
 
-    runai_cli_version = "2.9.25"
-
+    if current_cluster == "rcp-caas-prod":
+        runai_cli_version = "2.16.70"
+        scratch_name = "upamathis-scratch"
+    elif current_cluster == "rcp-caas-test":
+        runai_cli_version = "2.9.25"
+    elif current_cluster == "ic-caas":
+        runai_cli_version = "2.16.52"
+    assert (
+        current_cluster == args.cluster
+    ), f"Current cluster is {current_cluster}, but you specified {args.cluster}. Use --cluster {current_cluster}"
 
     if args.name is None:
         args.name = f"{user_cfg['user']}-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
@@ -241,6 +269,19 @@ spec:
     value: true
 """
 
+    #### some additional flags that can be added at the end of the config
+    if args.node_type in ["g10", "g9", "h100"]:
+        cfg += f"""
+  nodePools:
+    value: {args.node_type} # g10 for A100, g9 for V100 (only on IC cluster)
+"""
+    if args.node_type in ["g10", "h100"] and not args.train:
+        # for interactive jobs on A100s (g10 nodes), we need to set the jobs preemptible
+        # see table "Types of Workloads" https://inside.epfl.ch/ic-it-docs/ic-cluster/caas/submit-jobs/
+        cfg += f"""
+  preemptible:
+    value: true
+"""
     if args.host_ipc:
         cfg += f"""
   hostIpc:
@@ -251,6 +292,11 @@ spec:
         cfg += f"""
   backoffLimit: 
     value: {args.backofflimit}
+"""
+    if args.large_shm:
+        cfg += f"""
+  largeShm:
+    value: true
 """
 
     with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml") as f:
